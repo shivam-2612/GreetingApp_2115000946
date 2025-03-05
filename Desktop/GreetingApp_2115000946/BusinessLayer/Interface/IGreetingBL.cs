@@ -13,5 +13,7 @@ namespace BusinessLayer.Interface
         string GetGreetingMessage(string firstName = null, string lastName = null);
         GreetingEntity GetGreetingById(int id);  // New method
 
+        List<GreetingEntity> GetAllGreetings();
+
     }
 }

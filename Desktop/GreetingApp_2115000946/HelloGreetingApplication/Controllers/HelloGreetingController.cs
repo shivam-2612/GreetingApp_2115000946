@@ -201,6 +201,18 @@ namespace HelloGreetingApplication.Controllers
         }
 
 
+        [HttpGet("all")]
+        public IActionResult GetAllGreetings()
+        {
+            List<GreetingEntity> greetings = _greetingBL.GetAllGreetings();
+
+            if (greetings == null || greetings.Count == 0)
+                return NotFound(new { Message = "No greetings found!" });
+
+            return Ok(greetings);
+        }
+
+
 
 
     }

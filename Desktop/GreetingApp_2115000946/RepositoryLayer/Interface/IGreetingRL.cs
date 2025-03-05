@@ -11,6 +11,7 @@ namespace RepositoryLayer.Interface
    
     public interface IGreetingRL
     {
+        List<GreetingEntity> GetAllGreetings();
         string GetGreeting(string firstName = null, string lastName = null);
         GreetingEntity GetGreetingById(int id);
         void SaveGreeting(GreetingEntity greeting);  // New method to save greetings
