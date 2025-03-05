@@ -76,7 +76,7 @@ namespace HelloGreetingApplication.Controllers
         /// <param name="key"></param>
         /// <param name="newValue"></param>
         /// <returns>Updated greeting message</returns>
-        [HttpPut("{key}")]
+        [HttpPut("IDKEY")]
         public IActionResult Put(string key, string newValue) 
         {
             if (!greetings.ContainsKey(key))
@@ -212,6 +212,15 @@ namespace HelloGreetingApplication.Controllers
             return Ok(greetings);
         }
 
+        [HttpPut("update")]
+        public IActionResult UpdateGreeting([FromBody] GreetingEntity updatedGreeting)
+        {
+            var greeting = _greetingBL.UpdateGreeting(updatedGreeting);
+            if (greeting == null)
+                return NotFound(new { Message = "Greeting not found!" });
+
+            return Ok(greeting);
+        }
 
 
 

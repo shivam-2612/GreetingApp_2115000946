@@ -54,5 +54,23 @@ namespace RepositoryLayer.Service
         {
             return _dbContext.Greetings.ToList();
         }
+
+
+        public GreetingEntity UpdateGreeting(GreetingEntity updatedGreeting)  // New Method
+        {
+            var existingGreeting = _dbContext.Greetings.FirstOrDefault(g => g.Id == updatedGreeting.Id);
+
+            if (existingGreeting != null)
+            {
+                existingGreeting.FirstName = updatedGreeting.FirstName ?? existingGreeting.FirstName;
+                existingGreeting.LastName = updatedGreeting.LastName ?? existingGreeting.LastName;
+                existingGreeting.Message = updatedGreeting.Message ?? existingGreeting.Message;
+                existingGreeting.CreatedAt = updatedGreeting.CreatedAt != default ? updatedGreeting.CreatedAt : existingGreeting.CreatedAt;
+
+                _dbContext.SaveChanges();
+                return existingGreeting;
+            }
+            return null;
+        }
     }
 }

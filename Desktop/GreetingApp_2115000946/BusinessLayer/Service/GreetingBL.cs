@@ -49,5 +49,12 @@ namespace BusinessLayer.Service
         {
             return _greetingRL.GetAllGreetings();
         }
+
+
+        public GreetingEntity UpdateGreeting(GreetingEntity updatedGreeting)  // New Method
+        {
+            return _greetingRL.UpdateGreeting(updatedGreeting);
+        }
+
     }
 }
