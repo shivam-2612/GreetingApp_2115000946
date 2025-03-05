@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BusinessLayer.Interface;
 using ModelLayer.Model;
 using RepositoryLayer.Interface;
 
 namespace BusinessLayer.Service
 {
-    public class GreetingBL:IGreetingBL
+    public class GreetingBL : IGreetingBL
     {
         private readonly IGreetingRL _greetingRL;
 
@@ -17,8 +13,6 @@ namespace BusinessLayer.Service
         {
             _greetingRL = greetingRL;
         }
-
-
 
         public string GetGreetingMessage(string firstName = null, string lastName = null)
         {
@@ -28,8 +22,19 @@ namespace BusinessLayer.Service
                 LastName = lastName
             };
 
-            return greetingModel.GenerateGreeting();
-        }
+            string message = greetingModel.GenerateGreeting();
 
+            // Save greeting in repository
+            GreetingEntity greetingEntity = new GreetingEntity
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Message = message
+            };
+
+            _greetingRL.SaveGreeting(greetingEntity);
+
+            return message;
+        }
     }
 }

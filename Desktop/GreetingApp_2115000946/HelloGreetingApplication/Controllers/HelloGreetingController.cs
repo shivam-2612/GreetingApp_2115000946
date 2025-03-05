@@ -172,6 +172,25 @@ namespace HelloGreetingApplication.Controllers
         }
 
 
+        [HttpPost("addgreet")]
+        public IActionResult AddGreeting([FromQuery] string firstName, [FromQuery] string lastName)
+        {
+            string message = _greetingBL.GetGreetingMessage(firstName, lastName);
+
+            // Create response with additional details
+            var response = new
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Message = message,
+                CreatedAt = DateTime.Now  // Set current timestamp
+            };
+
+            return Ok(response);
+        }
+
+
+
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RepositoryLayer.DTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,6 @@ namespace BusinessLayer.Interface
 {
     public interface IGreetingBL
     {
-        
         string GetGreetingMessage(string firstName = null, string lastName = null);
     }
 }

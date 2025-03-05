@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using RepositoryLayer.Interface;
+using ModelLayer.Model;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RepositoryLayer.Interface;
-using RepositoryLayer.Interface;
-using ModelLayer.Model; // Import GreetingModel
+using RepositoryLayer.Context;
 
 namespace RepositoryLayer.Service
 {
     public class GreetingRL : IGreetingRL
     {
+        private readonly GreetingDbContext _dbContext;
+
+        public GreetingRL(GreetingDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         public string GetGreeting(string firstName = null, string lastName = null)
         {
             GreetingModel greetingModel = new GreetingModel
@@ -19,8 +22,24 @@ namespace RepositoryLayer.Service
                 LastName = lastName
             };
 
-            return greetingModel.GenerateGreeting();
+            string message = greetingModel.GenerateGreeting();
+
+            // Save greeting in database
+            SaveGreeting(new GreetingEntity
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Message = message,
+                CreatedAt = DateTime.Now
+            });
+
+            return message;
+        }
+
+        public void SaveGreeting(GreetingEntity greeting)
+        {
+            _dbContext.Greetings.Add(greeting);
+            _dbContext.SaveChanges();
         }
     }
 }
-
