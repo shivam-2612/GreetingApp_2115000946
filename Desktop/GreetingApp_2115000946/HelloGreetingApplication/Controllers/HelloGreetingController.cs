@@ -164,6 +164,14 @@ namespace HelloGreetingApplication.Controllers
         }
 
 
+        [HttpPost("getfirstname")]
+        public IActionResult GetGreeting([FromQuery] string firstName = null, [FromQuery] string lastName = null)
+        {
+            string message = _greetingBL.GetGreetingMessage(firstName, lastName);
+            return Ok(new { Greeting = message });
+        }
+
+
 
     }
 }

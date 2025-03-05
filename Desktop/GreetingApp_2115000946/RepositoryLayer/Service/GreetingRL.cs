@@ -4,14 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RepositoryLayer.Interface;
+using RepositoryLayer.Interface;
+using ModelLayer.Model; // Import GreetingModel
 
 namespace RepositoryLayer.Service
 {
-    public class GreetingRL:IGreetingRL
+    public class GreetingRL : IGreetingRL
     {
-        public string GetGreeting()
+        public string GetGreeting(string firstName = null, string lastName = null)
         {
-            return "Hello World";
+            GreetingModel greetingModel = new GreetingModel
+            {
+                FirstName = firstName,
+                LastName = lastName
+            };
+
+            return greetingModel.GenerateGreeting();
         }
     }
 }
+

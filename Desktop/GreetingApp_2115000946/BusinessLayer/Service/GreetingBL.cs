@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessLayer.Interface;
+using ModelLayer.Model;
 using RepositoryLayer.Interface;
 
 namespace BusinessLayer.Service
@@ -17,9 +18,18 @@ namespace BusinessLayer.Service
             _greetingRL = greetingRL;
         }
 
-        public string GetGreetingMessage()
+
+
+        public string GetGreetingMessage(string firstName = null, string lastName = null)
         {
-            return _greetingRL.GetGreeting();
+            GreetingModel greetingModel = new GreetingModel
+            {
+                FirstName = firstName,
+                LastName = lastName
+            };
+
+            return greetingModel.GenerateGreeting();
         }
+
     }
 }
