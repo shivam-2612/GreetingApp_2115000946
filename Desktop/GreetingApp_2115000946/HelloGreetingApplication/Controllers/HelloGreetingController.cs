@@ -222,7 +222,15 @@ namespace HelloGreetingApplication.Controllers
             return Ok(greeting);
         }
 
+        [HttpDelete("{id}")]
+        public IActionResult DeleteGreeting(int id)
+        {
+            bool isDeleted = _greetingBL.DeleteGreeting(id);
+            if (!isDeleted)
+                return NotFound(new { Message = "Greeting not found!" });
 
+            return Ok(new { Message = "Greeting deleted successfully!" });
+        }
 
     }
 }

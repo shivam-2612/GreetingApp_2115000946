@@ -56,5 +56,11 @@ namespace BusinessLayer.Service
             return _greetingRL.UpdateGreeting(updatedGreeting);
         }
 
+
+        public bool DeleteGreeting(int id)
+        {
+            return _greetingRL.DeleteGreeting(id);
+        }
+
     }
 }

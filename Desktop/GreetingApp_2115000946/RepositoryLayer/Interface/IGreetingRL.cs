@@ -11,6 +11,7 @@ namespace RepositoryLayer.Interface
    
     public interface IGreetingRL
     {
+        bool DeleteGreeting(int id);
         List<GreetingEntity> GetAllGreetings();
         string GetGreeting(string firstName = null, string lastName = null);
         GreetingEntity GetGreetingById(int id);
