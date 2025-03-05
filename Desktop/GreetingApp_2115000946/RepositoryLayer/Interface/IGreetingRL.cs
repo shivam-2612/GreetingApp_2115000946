@@ -12,7 +12,10 @@ namespace RepositoryLayer.Interface
     public interface IGreetingRL
     {
         string GetGreeting(string firstName = null, string lastName = null);
+        GreetingEntity GetGreetingById(int id);
         void SaveGreeting(GreetingEntity greeting);  // New method to save greetings
+
+
     }
 
 }

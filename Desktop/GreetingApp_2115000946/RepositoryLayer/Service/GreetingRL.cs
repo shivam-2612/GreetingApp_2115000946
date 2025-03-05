@@ -41,5 +41,11 @@ namespace RepositoryLayer.Service
             _dbContext.Greetings.Add(greeting);
             _dbContext.SaveChanges();
         }
+
+
+        public GreetingEntity GetGreetingById(int id)  // New Method
+        {
+            return _dbContext.Greetings.FirstOrDefault(g => g.Id == id);
+        }
     }
 }

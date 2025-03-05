@@ -190,6 +190,17 @@ namespace HelloGreetingApplication.Controllers
         }
 
 
+        [HttpGet("{id}")]
+        public IActionResult GetGreetingById(int id)
+        {
+            var greeting = _greetingBL.GetGreetingById(id);
+            if (greeting == null)
+                return NotFound(new { Message = "Greeting not found!" });
+
+            return Ok(greeting);
+        }
+
+
 
 
     }

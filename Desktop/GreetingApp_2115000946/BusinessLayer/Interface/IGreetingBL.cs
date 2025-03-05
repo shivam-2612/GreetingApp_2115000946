@@ -1,4 +1,5 @@
-﻿using RepositoryLayer.DTO;
+﻿using ModelLayer.Model;
+using RepositoryLayer.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,7 @@ namespace BusinessLayer.Interface
     public interface IGreetingBL
     {
         string GetGreetingMessage(string firstName = null, string lastName = null);
+        GreetingEntity GetGreetingById(int id);  // New method
+
     }
 }

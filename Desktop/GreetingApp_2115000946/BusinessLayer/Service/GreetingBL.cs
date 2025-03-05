@@ -36,5 +36,11 @@ namespace BusinessLayer.Service
 
             return message;
         }
+
+
+        public GreetingEntity GetGreetingById(int id)  // New Method
+        {
+            return _greetingRL.GetGreetingById(id);
+        }
     }
 }
