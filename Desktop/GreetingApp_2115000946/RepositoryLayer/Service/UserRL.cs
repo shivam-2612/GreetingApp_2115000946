@@ -2,6 +2,8 @@
 using RepositoryLayer.Context;
 using RepositoryLayer.Interface;
 using System.Linq;
+using BCrypt.Net;
+
 
 namespace RepositoryLayer.Service
 {
@@ -19,10 +21,19 @@ namespace RepositoryLayer.Service
             _context.Users.Add(user);
             return _context.SaveChanges() > 0;
         }
-
-        public UserModel GetUserByEmail(string email, string password)
+        public UserModel GetUserByEmail(string email)
         {
-            return _context.Users.FirstOrDefault(u => u.Email == email && u.PasswordHash == password);
+            return _context.Users.FirstOrDefault(u => u.Email == email);
+        }
+
+        public bool UpdatePassword(string email, string newPassword)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (user == null) return false;
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            _context.SaveChanges();
+            return true;
         }
     }
 }
