@@ -1,36 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BusinessLayer.Interface;
+﻿using BusinessLayer.Interface;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using ModelLayer.Model;
 using RepositoryLayer.Interface;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
-
+using System.Text;
 
 namespace BusinessLayer.Service
 {
     public class UserBL : IUserBL
     {
         private readonly IUserRL _userRL;
+        private readonly IConfiguration _configuration;
 
-        public UserBL(IUserRL userRL)
+        public UserBL(IUserRL userRL, IConfiguration configuration)
         {
             _userRL = userRL;
+            _configuration = configuration;
         }
 
-        public bool Register(UserModel user)
+        public string Register(UserModel user)
         {
-            // Hash Password before saving to DB
             user.PasswordHash = HashPassword(user.PasswordHash);
-            return _userRL.Register(user);
+            bool isRegistered = _userRL.Register(user);
+            if (!isRegistered)
+                return "Registration failed"; // Return failure message
+
+            // ✅ Generate JWT token on successful registration
+            return GenerateJwtToken(user);
         }
 
         public string Login(string email, string password)
         {
             string hashedPassword = HashPassword(password);
-            return _userRL.Login(email, hashedPassword);
+            var user = _userRL.GetUserByEmail(email, hashedPassword);
+            return user != null ? GenerateJwtToken(user) : null;
         }
 
         private string HashPassword(string password)
@@ -41,6 +48,27 @@ namespace BusinessLayer.Service
                 return Convert.ToBase64String(bytes);
             }
         }
+
+        private string GenerateJwtToken(UserModel user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email)
+                }),
+                Expires = DateTime.UtcNow.AddHours(2),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = _configuration["Jwt:Issuer"],
+                Audience = _configuration["Jwt:Audience"]
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
     }
 }
-

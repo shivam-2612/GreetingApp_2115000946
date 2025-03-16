@@ -18,25 +18,21 @@ namespace HelloGreetingApplication.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] UserModel user)
         {
-            var result = _userBL.Register(user);
-            if (result)
-                return Ok(new { message = "User registered successfully" });
-            return BadRequest(new { message = "Registration failed" });
+            var token = _userBL.Register(user);
+            if (token == "Registration failed")
+                return BadRequest(new { message = "User registration failed" });
+
+            return Ok(new { Token = token });
         }
 
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginModel login)
         {
-            var result = _userBL.Login(login.Email, login.Password);
-            if (result == "Login Successful")
-                return Ok(new { message = result });
+            var token = _userBL.Login(login.Email, login.Password);
+            if (token != null)
+                return Ok(new { Token = token });
+
             return Unauthorized(new { message = "Invalid Credentials" });
         }
-    }
-
-    public class LoginModel
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
     }
 }

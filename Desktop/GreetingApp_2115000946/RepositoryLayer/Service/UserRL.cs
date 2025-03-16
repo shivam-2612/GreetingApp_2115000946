@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using ModelLayer.Model;
+﻿using ModelLayer.Model;
 using RepositoryLayer.Context;
 using RepositoryLayer.Interface;
-
+using System.Linq;
 
 namespace RepositoryLayer.Service
 {
@@ -26,10 +20,9 @@ namespace RepositoryLayer.Service
             return _context.SaveChanges() > 0;
         }
 
-        public string Login(string email, string password)
+        public UserModel GetUserByEmail(string email, string password)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == email && u.PasswordHash == password);
-            return user != null ? "Login Successful" : "Invalid Credentials";
+            return _context.Users.FirstOrDefault(u => u.Email == email && u.PasswordHash == password);
         }
     }
 }

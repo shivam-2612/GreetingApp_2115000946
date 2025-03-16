@@ -1,12 +1,12 @@
-using BusinessLayer.Interface;
+﻿using BusinessLayer.Interface;
 using BusinessLayer.Service;
-using HelloGreetingApplication.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using HelloGreetingApplication.Middleware;
+using Microsoft.IdentityModel.Tokens;
 using RepositoryLayer.Context;
 using RepositoryLayer.Interface;
 using RepositoryLayer.Service;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,40 +15,46 @@ var connectionString = builder.Configuration.GetConnectionString("GreetingDB");
 builder.Services.AddDbContext<GreetingDbContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddControllers();
-
-// Add Swagger configuration without contact info
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Greeting API",
-        Version = "v1",
-        Description = "API for Greeting Application"
-    });
-});
-
-// Register Dependency Injection
-builder.Services.AddScoped<IGreetingBL, GreetingBL>();
-builder.Services.AddScoped<IGreetingRL, GreetingRL>();
+builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserBL, UserBL>();
 builder.Services.AddScoped<IUserRL, UserRL>();
 
+// ✅ Add JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidateAudience = true,
+        ValidAudience = jwtSettings["Audience"],
+        ValidateLifetime = true
+    };
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-app.UseMiddleware<ExceptionMiddleware>(); // Global Exception Handling Middleware
-
+// Configure middleware
 app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Greeting API v1");
-    //c.RoutePrefix = string.Empty; // Access Swagger at root URL
-});
-
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
 
+// ✅ Enable Authentication & Authorization Middleware
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
 app.Run();
