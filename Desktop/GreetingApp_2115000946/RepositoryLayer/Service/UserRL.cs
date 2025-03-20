@@ -26,6 +26,8 @@ namespace RepositoryLayer.Service
             return _context.Users.FirstOrDefault(u => u.Email == email);
         }
 
+
+
         public bool UpdatePassword(string email, string newPassword)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);

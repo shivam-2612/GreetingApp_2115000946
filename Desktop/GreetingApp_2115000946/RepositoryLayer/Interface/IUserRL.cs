@@ -9,5 +9,6 @@ namespace RepositoryLayer.Interface
 
         UserModel GetUserByEmail(string email);
         bool UpdatePassword(string email, string newPassword);
+
     }
 }

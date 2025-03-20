@@ -1,13 +1,15 @@
-﻿using BusinessLayer.Interface;
+﻿using System.Security.Claims;
+using BusinessLayer.Interface;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ModelLayer.Model;
 using RepositoryLayer.Interface;
 using System;
+
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+
 
 namespace BusinessLayer.Service
 {
@@ -15,6 +17,8 @@ namespace BusinessLayer.Service
     {
         private readonly IUserRL _userRL;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
+
 
         public UserBL(IUserRL userRL, IConfiguration configuration)
         {
@@ -36,7 +40,7 @@ namespace BusinessLayer.Service
         public string Login(string email, string password)
         {
             string hashedPassword = HashPassword(password);
-            var user = _userRL.GetUserByEmail(email, hashedPassword);
+            var user = _userRL.GetUserByEmail(email);
             return user != null ? GenerateJwtToken(user) : null;
         }
 
@@ -70,5 +74,71 @@ namespace BusinessLayer.Service
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+
+
+
+
+        public UserModel GetUserByEmail(string email)
+        {
+            return _userRL.GetUserByEmail(email);
+        }
+
+        public string GeneratePasswordResetToken(string email)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+            new Claim(ClaimTypes.Email, email),
+            new Claim("Purpose", "PasswordReset")
+        };
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string ValidateResetToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+
+            try
+            {
+                var parameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = _configuration["Jwt:Issuer"],
+                    ValidAudience = _configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
+
+                var principal = tokenHandler.ValidateToken(token, parameters, out SecurityToken validatedToken);
+                return principal.FindFirst(ClaimTypes.Email)?.Value;
+
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public bool ResetPassword(string email, string newPassword)
+        {
+            return _userRL.UpdatePassword(email, newPassword);
+        }
     }
+
 }
+
