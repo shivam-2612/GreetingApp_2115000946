@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ModelLayer.Model
 {
-    public class UserModel
+    public class UserEntity
     {
         [Key]
-        public int Id { get; set; }
+        public int UserId { get; set; } // Primary Key
 
         [Required]
         public string FirstName { get; set; }
@@ -22,8 +18,6 @@ namespace ModelLayer.Model
         public string Email { get; set; }
 
         [Required]
-        public string PasswordHash { get; set; } // Store hashed password
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string Password { get; set; } // Store hashed password
     }
 }
