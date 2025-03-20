@@ -19,6 +19,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserBL, UserBL>();
 builder.Services.AddScoped<IUserRL, UserRL>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 // ✅ Add JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
